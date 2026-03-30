@@ -6,7 +6,7 @@ thresholds: [13, 26]
 healthPoints: 10
 stress: 5
 attack: +4
-weapon: Fangs
+weapon: Fangs and Maw
 range: Melee
 damage: 2d10+4
 damageType: physical

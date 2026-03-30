@@ -28,7 +28,7 @@ The Skirmisher can reroll a 1 on an action roll
 
 ### Unseen Strike - Passive
 
-If the Skirmisher is Hidden when they make a successful standard attack against a target, it deals 2d8+3 physicalm damage instead of their standard damage.
+If the Skirmisher is Hidden when they make a successful standard attack against a target, it deals 2d8+3 physical damage instead of their standard damage.
 
 ### Maintain Distance - Passive
 
