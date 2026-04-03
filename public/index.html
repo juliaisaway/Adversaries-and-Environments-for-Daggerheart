@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Julia's Arsenal for Daggerheart</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Crete+Round&display=swap"
+    />
+    <link rel="stylesheet" href="styles/styles.css" />
+  </head>
+  <body>
+    <header id="mobile-header">
+      <h1>Julia's Arsenal for <span>Daggerheart</span></h1>
+      <button
+        id="menu-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="sidebar"
+        aria-label="Open menu"
+      >
+        <i data-feather="menu"></i>
+      </button>
+    </header>
+    <div id="sidebar-backdrop" hidden></div>
+    <div id="container">
+      <aside id="sidebar">
+        <h2>Julia's Arsenal for <span>Daggerheart</span></h2>
+        <ul id="file-list"></ul>
+      </aside>
+      <main id="content">
+        <div id="md-content">
+          <div class="card-stack">
+            <div class="welcome">
+              <h1>Welcome!</h1>
+              <p>Welcome to Julia's Arsenal for Daggerheart!</p>
+              <p>
+                This is a collection of Adversaries, Environments and Traps that
+                I used in my tabletop games! Check it on the sidebar and click
+                it to see the details!
+              </p>
+              <p>
+                Feel free to give any feedbacks to
+                <a href="mailto:hello@eusoujulia.com.br"
+                  >hello@eusoujulia.com.br</a
+                >
+                or on my
+                <a
+                  href="https://github.com/juliaisaway/julias-arsenal-for-daggerheart"
+                  target="_blank"
+                  >GitHub repository</a
+                >
+              </p>
+
+              <h2>Legal & Attribution</h2>
+              <p>
+                Darrington Press and the Darrington Press authorized work logo
+                are trademarks of Critical Role, LLC and used with permission.
+                This product includes materials from the <i>Daggerheart System
+                Reference Document 1.0</i> © Critical Role, LLC. All rights
+                reserved.</p>
+                <p>This work is based on Public Game Content and is
+                published under the terms of the <a href="https://www.darringtonpress.com/license/" target="_blank">Darrington Press Community
+                Gaming License (DPCGL)</a>.</p>
+                <p>This product contains original content, adaptations, and
+                modifications by the author. No previous third-party
+                modifications were used in this work. This is a fan-made project
+                and is not affiliated with or endorsed by Darrington Press or
+                Critical Role.</p>
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

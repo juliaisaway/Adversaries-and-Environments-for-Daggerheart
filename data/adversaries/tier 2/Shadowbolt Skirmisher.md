@@ -24,7 +24,7 @@ Isolate targets, fire from shadows, free when pressured
 
 ### Lucky - Passive
 
-The Skirmisher can reroll a 1 on an action roll
+The Skirmisher can reroll a 1 on an action roll.
 
 ### Unseen Strike - Passive
 
@@ -37,3 +37,7 @@ After making a standard attack, the Skirmisher can move anywhere within Far rang
 ### Cloaked - Action
 
 Mark a Stress to have the Skirmisher become Hidden until its next attack. Attacks made while Hidden from this feature have advantage.
+
+## Design notes
+
+I created this Adversary because I needed a noble NPC that acts cowardly, but still capable of fighting. So I though about a guy who sneaks and then shoots with his Crossbow from far. I believe it was a fun adversary to explore.

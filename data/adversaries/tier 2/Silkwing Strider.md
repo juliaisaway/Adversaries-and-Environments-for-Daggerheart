@@ -34,3 +34,7 @@ When the Strider is within Melee range of a creature and another Silkwing is wit
 ### Chittering Shriek - Action
 
 Mark 1 Stress to force all creatures within Very Close range to make an Presence Reaction Roll (14). On a failure, the next attack against the target has advantage.
+
+## Design notes
+
+I love the Silkwing design from the [Incredible Creatures](https://www.drivethrurpg.com/en/product/544239/incredible-creatures-adversaries-for-daggerheart), by Alan Tucker, but I needed more options for an encounter that I was planning. So I tried to follow the same principles and ended with this version of a Standard adversary.

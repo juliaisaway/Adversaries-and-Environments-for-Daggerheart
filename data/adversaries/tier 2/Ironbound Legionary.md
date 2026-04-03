@@ -30,3 +30,7 @@ Mark a Stress to force a target within Melee range to make a Strength Reaction R
 ### Driving Strike - Action
 
 Make an attack against a Vulnerable target within Melee range. On a success, mark a Stress to deal 2d12+4 physical damage. If the target marks HP from this attack, they must also mark a Stress.
+
+## Design notes
+
+I wanted a basic soldier with a sword and a shield and this is the result that I got. Not much to say about it.

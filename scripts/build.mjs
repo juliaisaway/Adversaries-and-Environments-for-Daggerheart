@@ -26,6 +26,14 @@ const allowedEnvironmentTypes = new Map([
   ["traversal", "Traversal"],
   ["event", "Event"],
 ]);
+const allowedTrapTypes = new Map([
+  ["harm", "Harm"],
+  ["snare", "Snare"],
+  ["debilitation", "Debilitation"],
+  ["hazard", "Hazard"],
+  ["disruption", "Disruption"],
+  ["lockdown", "Lockdown"],
+]);
 const requiredAdversaryFields = [
   "tier",
   "role",
@@ -40,6 +48,7 @@ const requiredAdversaryFields = [
   "damageType",
 ];
 const requiredEnvironmentFields = ["tier", "type", "difficulty", "potentialAdversaries"];
+const requiredTrapFields = ["tier", "type", "difficulty"];
 
 if (!existsSync(sourceDir)) {
   console.error("Source directory not found:", sourceDir);
@@ -53,9 +62,10 @@ if (shouldCleanOnly) {
   process.exit(0);
 }
 
-const markdownFiles = collectMarkdownFiles(sourceDir).filter(
-  (filePath) => !filePath.endsWith(`${sep}EXAMPLE.md`) && !filePath.endsWith(`${sep}EXAMPLE ENVIRONMENT.md`),
-);
+const markdownFiles = collectMarkdownFiles(sourceDir).filter((filePath) => {
+  const fileName = relative(sourceDir, filePath).split(sep).pop() ?? "";
+  return !/^EXAMPLE\b/i.test(fileName);
+});
 const manifest = [];
 
 for (const filePath of markdownFiles) {
@@ -84,9 +94,12 @@ manifest.sort((left, right) => left.title.localeCompare(right.title));
 
 const adversaryCount = manifest.filter((document) => document.kind === "adversary").length;
 const environmentCount = manifest.filter((document) => document.kind === "environment").length;
+const trapCount = manifest.filter((document) => document.kind === "trap").length;
 
 mkdirSync(outputDir, { recursive: true });
-console.log(`Built ${adversaryCount} adversary Markdown file(s) and ${environmentCount} environment Markdown file(s) into dist/.`);
+console.log(
+  `Built ${adversaryCount} adversary Markdown file(s), ${environmentCount} environment Markdown file(s), and ${trapCount} trap Markdown file(s) into dist/.`,
+);
 
 function collectMarkdownFiles(dirPath) {
   const entries = readdirSync(dirPath, { withFileTypes: true });
@@ -328,12 +341,30 @@ function parseList(lines, startIndex, indent, filePath) {
 }
 
 function detectDocumentKind(frontmatter, filePath) {
+  const normalizedPath = filePath.split(sep).join("/").toLowerCase();
+
+  if (normalizedPath.includes("/data/adversaries/")) {
+    return "adversary";
+  }
+
+  if (normalizedPath.includes("/data/environments/")) {
+    return "environment";
+  }
+
+  if (normalizedPath.includes("/data/traps/")) {
+    return "trap";
+  }
+
   if (typeof frontmatter.role === "string") {
     return "adversary";
   }
 
-  if (typeof frontmatter.type === "string") {
+  if (typeof frontmatter.type === "string" && Array.isArray(frontmatter.potentialAdversaries)) {
     return "environment";
+  }
+
+  if (typeof frontmatter.type === "string") {
+    return "trap";
   }
 
   throw new Error(`Could not determine document kind for ${filePath}`);
@@ -347,7 +378,12 @@ function validateFrontmatter(frontmatter, filePath) {
     return;
   }
 
-  validateEnvironmentFrontmatter(frontmatter, filePath);
+  if (kind === "environment") {
+    validateEnvironmentFrontmatter(frontmatter, filePath);
+    return;
+  }
+
+  validateTrapFrontmatter(frontmatter, filePath);
 }
 
 function validateAdversaryFrontmatter(frontmatter, filePath) {
@@ -411,9 +447,7 @@ function validateEnvironmentFrontmatter(frontmatter, filePath) {
   });
 
   if (missingFields.length > 0) {
-    throw new Error(
-      `Missing required frontmatter field(s) in ${filePath}: ${missingFields.join(", ")}.`,
-    );
+    throw new Error(`Missing required frontmatter field(s) in ${filePath}: ${missingFields.join(", ")}.`);
   }
 
   validateTier(frontmatter.tier, filePath);
@@ -452,11 +486,31 @@ function validateEnvironmentFrontmatter(frontmatter, filePath) {
   }
 }
 
+function validateTrapFrontmatter(frontmatter, filePath) {
+  const missingFields = requiredTrapFields.filter((field) => {
+    const value = frontmatter[field];
+    return value === undefined || value === null || value === "";
+  });
+
+  if (missingFields.length > 0) {
+    throw new Error(`Missing required frontmatter field(s) in ${filePath}: ${missingFields.join(", ")}.`);
+  }
+
+  validateTier(frontmatter.tier, filePath);
+  validateNonNegativeNumber(frontmatter.difficulty, "difficulty", filePath);
+
+  const normalizedType = String(frontmatter.type).toLowerCase();
+
+  if (!allowedTrapTypes.has(normalizedType)) {
+    throw new Error(
+      `Invalid type in ${filePath}. Expected one of ${Array.from(allowedTrapTypes.values()).join(", ")}, received: ${frontmatter.type}`,
+    );
+  }
+}
+
 function validateTier(value, filePath) {
   if (!allowedTiers.has(value)) {
-    throw new Error(
-      `Invalid tier in ${filePath}. Expected one of 1, 2, 3, or 4, received: ${value}`,
-    );
+    throw new Error(`Invalid tier in ${filePath}. Expected one of 1, 2, 3, or 4, received: ${value}`);
   }
 }
 
@@ -510,13 +564,14 @@ function buildSlug(relativePath) {
 }
 
 function normalizeSlugPart(part) {
-  return part
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+  return part.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
 function renderCompiledMarkdown(document) {
+  if (document.kind === "trap") {
+    return renderCompiledTrapMarkdown(document);
+  }
+
   if (document.kind === "environment") {
     return renderCompiledEnvironmentMarkdown(document);
   }
@@ -563,6 +618,7 @@ function renderCompiledAdversaryMarkdown(document) {
   output.push("## Features");
   output.push("");
   output.push(...renderFeatures(sections.features));
+  appendDesignNotes(output, sections.designNotes);
 
   return `${output.join("\n").trim()}\n`;
 }
@@ -593,6 +649,35 @@ function renderCompiledEnvironmentMarkdown(document) {
     output.push(`*${sections.flavor}*`);
   }
 
+  appendDesignNotes(output, sections.designNotes);
+
+  return `${output.join("\n").trim()}\n`;
+}
+
+function renderCompiledTrapMarkdown(document) {
+  const sections = extractTrapSections(document.body);
+  const typeLabel = formatTrapType(document.frontmatter.type);
+  const output = [
+    `# ${document.title}`,
+    "",
+    `## Tier ${document.frontmatter.tier ?? "?"} ${typeLabel}`.trim(),
+    "",
+    sections.description || "No description provided.",
+  ];
+
+  if (sections.purpose) {
+    output.push("");
+    output.push(`**Purpose:** ${sections.purpose}`);
+  }
+
+  output.push("");
+  output.push(`> Difficulty: ${document.frontmatter.difficulty ?? "-"}`);
+  output.push("");
+  output.push("## Features");
+  output.push("");
+  output.push(...renderTrapFeatures(sections.features));
+  appendDesignNotes(output, sections.designNotes);
+
   return `${output.join("\n").trim()}\n`;
 }
 
@@ -602,6 +687,7 @@ function extractAdversarySections(body) {
   const descriptionLines = [];
   const motivesLines = [];
   const featureLines = [];
+  const designNotesLines = [];
   let currentSection = "description";
 
   for (const rawLine of lines.slice(titleIndex + 1)) {
@@ -617,6 +703,11 @@ function extractAdversarySections(body) {
       continue;
     }
 
+    if (/^##\s+Design\s+notes/i.test(line)) {
+      currentSection = "designNotes";
+      continue;
+    }
+
     if (/^##\s+/.test(line) && currentSection !== "features") {
       currentSection = "other";
       continue;
@@ -628,6 +719,8 @@ function extractAdversarySections(body) {
       motivesLines.push(line);
     } else if (currentSection === "features") {
       featureLines.push(line);
+    } else if (currentSection === "designNotes") {
+      designNotesLines.push(line);
     }
   }
 
@@ -635,6 +728,7 @@ function extractAdversarySections(body) {
     description: collapseParagraph(descriptionLines) || "No description provided.",
     motives: collapseParagraph(motivesLines),
     features: featureLines,
+    designNotes: collapseParagraph(designNotesLines),
   };
 }
 
@@ -645,6 +739,7 @@ function extractEnvironmentSections(body) {
   const impulsesLines = [];
   const featureLines = [];
   const flavorLines = [];
+  const designNotesLines = [];
   let currentSection = "description";
 
   for (const rawLine of lines.slice(titleIndex + 1)) {
@@ -665,6 +760,11 @@ function extractEnvironmentSections(body) {
       continue;
     }
 
+    if (/^##\s+Design\s+notes/i.test(line)) {
+      currentSection = "designNotes";
+      continue;
+    }
+
     if (/^##\s+/.test(line)) {
       currentSection = "other";
       continue;
@@ -678,6 +778,8 @@ function extractEnvironmentSections(body) {
       featureLines.push(line);
     } else if (currentSection === "flavor") {
       flavorLines.push(line);
+    } else if (currentSection === "designNotes") {
+      designNotesLines.push(line);
     }
   }
 
@@ -686,14 +788,72 @@ function extractEnvironmentSections(body) {
     impulses: collapseParagraph(impulsesLines),
     features: featureLines,
     flavor: collapseParagraph(flavorLines),
+    designNotes: collapseParagraph(designNotesLines),
+  };
+}
+
+function extractTrapSections(body) {
+  const lines = body.split("\n");
+  const titleIndex = lines.findIndex((line) => /^#\s+/.test(line));
+  const descriptionLines = [];
+  const purposeLines = [];
+  const featureLines = [];
+  const designNotesLines = [];
+  let currentSection = "description";
+
+  for (const rawLine of lines.slice(titleIndex + 1)) {
+    const line = rawLine.trimEnd();
+
+    if (/^##\s+Purpose/i.test(line)) {
+      currentSection = "purpose";
+      continue;
+    }
+
+    if (/^##\s+Features/i.test(line)) {
+      currentSection = "features";
+      continue;
+    }
+
+    if (/^##\s+Design\s+notes/i.test(line)) {
+      currentSection = "designNotes";
+      continue;
+    }
+
+    if (/^##\s+/.test(line)) {
+      currentSection = "other";
+      continue;
+    }
+
+    if (currentSection === "description") {
+      descriptionLines.push(line);
+    } else if (currentSection === "purpose") {
+      purposeLines.push(line);
+    } else if (currentSection === "features") {
+      featureLines.push(line);
+    } else if (currentSection === "designNotes") {
+      designNotesLines.push(line);
+    }
+  }
+
+  return {
+    description: collapseParagraph(descriptionLines),
+    purpose: collapseParagraph(purposeLines),
+    features: featureLines,
+    designNotes: collapseParagraph(designNotesLines),
   };
 }
 
 function collapseParagraph(lines) {
-  return lines
-    .join("\n")
-    .trim()
-    .replace(/\n{2,}/g, "\n\n");
+  return lines.join("\n").trim().replace(/\n{2,}/g, "\n\n");
+}
+
+function appendDesignNotes(output, designNotes) {
+  if (!designNotes) {
+    return;
+  }
+
+  output.push("");
+  output.push(`> **Design notes:** ${designNotes}`);
 }
 
 function renderFeatureBlock(lines) {
@@ -709,6 +869,7 @@ function renderFeatureBlock(lines) {
 
   return normalizedLines.length > 0 ? normalizedLines : ["No features listed."];
 }
+
 function renderFeatures(featureLines) {
   const trimmedLines = featureLines.map((line) => line.trimEnd());
   const headingFeatures = parseHeadingFeatures(trimmedLines);
@@ -729,9 +890,90 @@ function renderFeatures(featureLines) {
     return `**${match[1].trim()}:** ${match[2].trim()}`;
   });
 
-  return inlineFeatures.length > 0
-    ? interleaveFeatureParagraphs(inlineFeatures)
-    : ["No features listed."];
+  return inlineFeatures.length > 0 ? interleaveFeatureParagraphs(inlineFeatures) : ["No features listed."];
+}
+
+function renderTrapFeatures(lines) {
+  const features = [];
+  let currentFeature = null;
+  let currentField = "";
+
+  for (const rawLine of lines) {
+    const line = rawLine.trimEnd();
+
+    if (!line) {
+      continue;
+    }
+
+    const featureMatch = line.match(/^###\s+(.+)$/);
+
+    if (featureMatch) {
+      if (currentFeature) {
+        features.push(currentFeature);
+      }
+
+      currentFeature = {
+        title: featureMatch[1].trim(),
+        trigger: "",
+        effect: "",
+        extra: [],
+      };
+      currentField = "";
+      continue;
+    }
+
+    const fieldMatch = line.match(/^####\s+(Trigger|Effect)$/i);
+
+    if (fieldMatch) {
+      currentField = fieldMatch[1].toLowerCase();
+      continue;
+    }
+
+    if (!currentFeature) {
+      continue;
+    }
+
+    if (currentField === "trigger") {
+      currentFeature.trigger = currentFeature.trigger ? `${currentFeature.trigger}\n\n${line.trim()}` : line.trim();
+      continue;
+    }
+
+    if (currentField === "effect") {
+      currentFeature.effect = currentFeature.effect ? `${currentFeature.effect}\n\n${line.trim()}` : line.trim();
+      continue;
+    }
+
+    currentFeature.extra.push(line.trim());
+  }
+
+  if (currentFeature) {
+    features.push(currentFeature);
+  }
+
+  if (features.length === 0) {
+    return ["No features listed."];
+  }
+
+  return features.flatMap((feature, index) => {
+    const block = [`### ${feature.title}`];
+
+    if (feature.trigger) {
+      block.push("");
+      block.push(`**Trigger:** ${feature.trigger}`);
+    }
+
+    if (feature.effect) {
+      block.push("");
+      block.push(`**Effect:** ${feature.effect}`);
+    }
+
+    if (feature.extra.length > 0) {
+      block.push("");
+      block.push(feature.extra.join("\n\n"));
+    }
+
+    return index === 0 ? block : ["", ...block];
+  });
 }
 
 function interleaveFeatureParagraphs(features) {
@@ -791,6 +1033,11 @@ function formatEnvironmentType(type) {
   return allowedEnvironmentTypes.get(normalized) ?? formatRole(type);
 }
 
+function formatTrapType(type) {
+  const normalized = String(type).toLowerCase();
+  return allowedTrapTypes.get(normalized) ?? formatRole(type);
+}
+
 function formatThresholds(thresholds) {
   if (Array.isArray(thresholds)) {
     return thresholds.join("/");
@@ -845,5 +1092,11 @@ function formatPotentialAdversaries(value) {
     .filter(Boolean)
     .join(", ");
 }
+
+
+
+
+
+
 
 

@@ -1,6 +1,10 @@
-# 👺 Adversaries and Environments for Daggerheart
+# 👺 Julia's Arsenal for Daggerheart
 
-Repository for custom Daggerheart adversaries and environments written in Markdown and compiled into presentation-ready Markdown files.
+Welcome to Julia's Arsenal for Daggerheart.
+
+This is a collection of custom **Adversaries**, **Environments**, and **Traps** that I used in my tabletop games, all written in Markdown and compiled into presentation-ready files for the site viewer.
+
+If you have feedback, ideas, or suggestions, feel free to reach out at [hello@eusoujulia.com.br](mailto:hello@eusoujulia.com.br).
 
 > ⚠️ This is a fan-made project and is not affiliated with or endorsed by Darrington Press or Critical Role.
 
@@ -14,6 +18,7 @@ This fan project uses material inspired by:
 - [Incredible Creatures: Adversaries for Daggerheart](https://www.drivethrurpg.com/en/product/544239/incredible-creatures-adversaries-for-daggerheart), by *Alan Tucker*
 - [Wondrous Environments](https://www.drivethrurpg.com/en/product/552648/wondrous-environments), by *TheWelshDM*
 - [Martial Adversaries for Daggerheart](https://www.drivethrurpg.com/en/product/548239/martial-adversaries-for-daggerheart?src=hottest_filtered) and [Undead Adversaries for Daggerheart](https://www.drivethrurpg.com/en/product/556994/undead-adversaries-for-daggerheart?src=hottest_filtered), by *Sean vas Terra*
+- And other Tabletop RPG games...
 
 ---
 

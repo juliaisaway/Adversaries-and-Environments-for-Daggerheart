@@ -1,11 +1,21 @@
 {
-  "name": "adversaries-and-environments-for-daggerheart",
+  "name": "julias-arsenal-for-daggerheart",
   "version": "0.1.0",
   "private": true,
-  "description": "Repository for custom Daggerheart adversaries written in Markdown with frontmatter.",
+  "description": "Julia's Arsenal for Daggerheart: Repository for custom Daggerheart adversaries and environments written in Markdown with frontmatter.",
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "clean": "node scripts/build.mjs --clean"
+    "clean": "node scripts/build.mjs --clean",
+    "watch-css": "sass public/styles/styles.scss public/styles/styles.css --watch --style=compressed",
+    "dev": "concurrently \"npm run watch-css\" \"node scripts/server.js\""
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "marked": "^17.0.5"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "sass": "^1.98.0"
   }
 }
