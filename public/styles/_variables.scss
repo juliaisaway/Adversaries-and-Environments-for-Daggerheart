@@ -1,0 +1,74 @@
+@use "functions";
+
+:root {
+
+  /* Colors */
+  --bg: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(229, 226, 221, 1) 100%
+  );
+  --primary-color: #763c88;
+  --bg-fallback: #ffffff;
+  --sidebar-bg: #222;
+  --sidebar-color: #ccc;
+  --sidebar-hover-color: #fff;
+  --adv-card-bg: #f4f0e7;
+  --adv-border-color: #bda980;
+  --env-card-bg: #ebecec;
+  --env-border-color: #9ea0a2;
+  --trap-card-bg: #e8f1e7;
+  --trap-border-color: #7ea07a;
+  --welcome-card-bg: #eef1f6;
+  --welcome-border-color: #8797b0;
+  --design-notes-bg: #f8efea;
+  --design-notes-border: #d08a73;
+  --block-table-bg: #ffffff;
+  --text-dark: #191919;
+  --text-light: #333;
+  --file-li-selected-bg: var(--primary-color);
+  --file-li-selected-color: #fff;
+  --category-header-color: #aaa;
+  --tier-header-color: #666;
+
+  /* Mobile-specific colors */
+  --mobile-header-bg: rgba(25, 25, 25, 0.95);
+  --mobile-header-border: rgba(255, 255, 255, 0.08);
+  --mobile-toggle-border: rgba(255, 255, 255, 0.14);
+  --mobile-toggle-bg: rgba(255, 255, 255, 0.06);
+  --mobile-toggle-color: #ffffff;
+  --sidebar-backdrop-bg: rgba(0, 0, 0, 0.45);
+  --sidebar-shadow-color: rgba(0, 0, 0, 0.2);
+  --focus-ring-color: rgba(255, 255, 255, 0.85);
+
+  /* Spacing and typography */
+  --sidebar-width: 320px;
+  --sidebar-padding: 32px 24px 32px 48px;
+  --content-padding: 40px 48px;
+  --file-li-margin: 0 0 4px 0;
+  --file-li-padding: 10px 16px;
+  --file-li-border-radius: 8px;
+  --md-content-padding: 32px;
+  --card-padding: 12px;
+  --card-margin: auto;
+  --h1-margin: 0 0 8px 0;
+  --block-padding: 8px 16px;
+  --h2-margin: 12px 0 10px 0;
+  --p-margin: 0 0 10px 0;
+  --mobile-header-height: #{functions.rem(72)};
+
+  @media (max-width: #{functions.rem(896)}) {
+    --sidebar-width: 100%;
+    --sidebar-padding: #{functions.rem(20)} #{functions.rem(16)} #{functions.rem(24)};
+    --content-padding: #{functions.rem(16)};
+    --md-content-padding: 0;
+    --card-padding: #{functions.rem(14)};
+    --block-padding: #{functions.rem(12)} #{functions.rem(14)};
+  }
+
+  @media (max-width: #{functions.rem(640)}) {
+    --content-padding: #{functions.rem(12)};
+    --card-padding: #{functions.rem(12)};
+    --mobile-header-height: #{functions.rem(64)};
+  }
+}

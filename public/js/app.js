@@ -1,4 +1,10 @@
 let isMobileMenuOpen = false;
+const STATIC_PAGE_HOME = "home";
+const STATIC_PAGE_CHANGELOG = "changelog";
+const STATIC_PAGE_FILES = {
+  [STATIC_PAGE_HOME]: "/content/index.md",
+  [STATIC_PAGE_CHANGELOG]: "/content/changelog.md",
+};
 
 function withExternalTargets(html) {
   return html.replace(/<a\b(?![^>]*\btarget=)([^>]*)>/gi, '<a$1 target="_blank" rel="noopener noreferrer">');
@@ -78,6 +84,7 @@ async function loadFileList() {
   const mainTitle = sidebar.querySelector("h2");
   sidebar.innerHTML = "";
   sidebar.appendChild(mainTitle);
+  appendStaticNavigation(sidebar);
 
   const organized = {
     adversaries: {},
@@ -149,13 +156,12 @@ async function loadFileList() {
         sidebar.appendChild(ul);
       });
   });
+
+  await loadInitialRoute();
 }
 
 async function selectFile(file, link) {
-  document.querySelectorAll(".file-sublist a").forEach((el) => {
-    el.classList.remove("selected");
-    el.removeAttribute("aria-current");
-  });
+  clearSidebarSelection();
 
   link.classList.add("selected");
   link.setAttribute("aria-current", "page");
@@ -182,6 +188,116 @@ async function selectFile(file, link) {
   }
 
   content.innerHTML = withExternalTargets(marked.parse(md));
+}
+
+function appendStaticNavigation(sidebar) {
+  const categoryHeader = document.createElement("h3");
+  categoryHeader.className = "category-header";
+  categoryHeader.textContent = "Pages";
+  sidebar.appendChild(categoryHeader);
+
+  const ul = document.createElement("ul");
+  ul.className = "file-sublist static-pages";
+
+  [
+    { label: "Home", route: STATIC_PAGE_HOME },
+    { label: "Changelog", route: STATIC_PAGE_CHANGELOG },
+  ].forEach((page) => {
+    const li = document.createElement("li");
+    const link = document.createElement("a");
+    link.href = `#${page.route}`;
+    link.textContent = page.label;
+    link.dataset.page = page.route;
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      selectStaticPage(page.route, link);
+    });
+    li.appendChild(link);
+    ul.appendChild(li);
+  });
+
+  sidebar.appendChild(ul);
+}
+
+function clearSidebarSelection() {
+  document.querySelectorAll("#sidebar a").forEach((el) => {
+    el.classList.remove("selected");
+    el.removeAttribute("aria-current");
+  });
+}
+
+function selectStaticPage(page, link) {
+  clearSidebarSelection();
+
+  if (page !== STATIC_PAGE_HOME && link) {
+    link.classList.add("selected");
+    link.setAttribute("aria-current", "page");
+  }
+
+  window.history.replaceState(null, "", `#${page}`);
+  closeMobileMenuIfNeeded();
+  renderStaticPage(page);
+}
+
+async function loadInitialRoute() {
+  const route = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+
+  if (!route || route === STATIC_PAGE_HOME) {
+    selectStaticPage(STATIC_PAGE_HOME);
+    return;
+  }
+
+  if (route === STATIC_PAGE_CHANGELOG) {
+    const changelogLink = document.querySelector(`#sidebar a[data-page="${STATIC_PAGE_CHANGELOG}"]`);
+    selectStaticPage(STATIC_PAGE_CHANGELOG, changelogLink);
+    return;
+  }
+
+  const fileLink = Array.from(document.querySelectorAll(".file-sublist a")).find(
+    (link) => !link.dataset.page && decodeURIComponent(link.getAttribute("href").slice(1)) === route,
+  );
+
+  if (fileLink) {
+    await selectFile(route, fileLink);
+    return;
+  }
+
+  selectStaticPage(STATIC_PAGE_HOME);
+}
+
+async function renderStaticPage(page) {
+  const content = document.getElementById("md-content");
+  const filePath = STATIC_PAGE_FILES[page];
+
+  if (!filePath) {
+    content.innerHTML = renderStaticMarkdown("# Page not found");
+    return;
+  }
+
+  try {
+    const res = await fetch(filePath);
+
+    if (!res.ok) {
+      throw new Error(`Unable to load ${filePath}`);
+    }
+
+    const md = await res.text();
+    content.innerHTML = renderStaticMarkdown(md);
+  } catch (error) {
+    content.innerHTML = renderStaticMarkdown(
+      `# Content unavailable\n\nThere was a problem loading this page.`,
+    );
+  }
+}
+
+function renderStaticMarkdown(md) {
+  return `
+    <div class="card-stack">
+      <div class="welcome">
+        ${withExternalTargets(marked.parse(md))}
+      </div>
+    </div>
+  `;
 }
 
 function renderAdversaryCard(md) {
