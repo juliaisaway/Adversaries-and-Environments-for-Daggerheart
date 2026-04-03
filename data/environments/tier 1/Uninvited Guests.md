@@ -1,5 +1,5 @@
 ---
-tier: 2
+tier: 1
 type: exploration
 difficulty: 12
 potentialAdversaries:
