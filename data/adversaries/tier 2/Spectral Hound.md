@@ -10,6 +10,7 @@ weapon: Bite and Claws
 range: Melee
 damage: 2d8+6
 damageType: magic
+experience: [Ancient Knowledge +2]
 ---
 
 # Spectral Hound

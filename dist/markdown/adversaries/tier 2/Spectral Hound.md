@@ -8,6 +8,7 @@ A ghostly hunting hound bound to an ancient battlefield, phasing in and out of r
 
 > Difficulty: 13 | Thresholds: 10/22 | HP: 5 | Stress 3
 > ATK: +3 | Bite and Claws: Melee | 2d8+6 mag
+> Experience: Ancient Knowledge +2
 
 ## Features
 
