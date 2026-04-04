@@ -70,21 +70,13 @@ const manifest = [];
 
 for (const filePath of markdownFiles) {
   const source = readFileSync(filePath, "utf8");
-  const parsed = parseMarkdownDocument(source, filePath);
   const relativePath = relative(sourceDir, filePath);
   const slug = buildSlug(relativePath);
   const outputMarkdownPath = join(outputDir, "markdown", relativePath);
 
   mkdirSync(dirname(outputMarkdownPath), { recursive: true });
 
-  const document = {
-    slug,
-    source: relativePath.split(sep).join("/"),
-    title: parsed.title,
-    frontmatter: parsed.frontmatter,
-    body: parsed.body.trim(),
-    kind: detectDocumentKind(parsed.frontmatter, filePath),
-  };
+  const document = buildDocument(source, filePath, relativePath, slug);
 
   writeFileSync(outputMarkdownPath, renderCompiledMarkdown(document));
   manifest.push(document);
@@ -95,11 +87,38 @@ manifest.sort((left, right) => left.title.localeCompare(right.title));
 const adversaryCount = manifest.filter((document) => document.kind === "adversary").length;
 const environmentCount = manifest.filter((document) => document.kind === "environment").length;
 const trapCount = manifest.filter((document) => document.kind === "trap").length;
+const conditionCount = manifest.filter((document) => document.kind === "condition").length;
 
 mkdirSync(outputDir, { recursive: true });
 console.log(
-  `Built ${adversaryCount} adversary Markdown file(s), ${environmentCount} environment Markdown file(s), and ${trapCount} trap Markdown file(s) into dist/.`,
+  `Built ${adversaryCount} adversary Markdown file(s), ${environmentCount} environment Markdown file(s), ${trapCount} trap Markdown file(s), and ${conditionCount} condition Markdown file(s) into dist/.`,
 );
+
+function buildDocument(source, filePath, relativePath, slug) {
+  const kind = detectDocumentKind(null, filePath);
+
+  if (kind === "condition") {
+    return {
+      slug,
+      source: relativePath.split(sep).join("/"),
+      title: extractMarkdownTitle(source, filePath),
+      frontmatter: {},
+      body: source.trim(),
+      kind,
+    };
+  }
+
+  const parsed = parseMarkdownDocument(source, filePath);
+
+  return {
+    slug,
+    source: relativePath.split(sep).join("/"),
+    title: parsed.title,
+    frontmatter: parsed.frontmatter,
+    body: parsed.body.trim(),
+    kind: detectDocumentKind(parsed.frontmatter, filePath),
+  };
+}
 
 function collectMarkdownFiles(dirPath) {
   const entries = readdirSync(dirPath, { withFileTypes: true });
@@ -355,15 +374,19 @@ function detectDocumentKind(frontmatter, filePath) {
     return "trap";
   }
 
-  if (typeof frontmatter.role === "string") {
+  if (normalizedPath.includes("/data/conditions/")) {
+    return "condition";
+  }
+
+  if (typeof frontmatter?.role === "string") {
     return "adversary";
   }
 
-  if (typeof frontmatter.type === "string" && Array.isArray(frontmatter.potentialAdversaries)) {
+  if (typeof frontmatter?.type === "string" && Array.isArray(frontmatter?.potentialAdversaries)) {
     return "environment";
   }
 
-  if (typeof frontmatter.type === "string") {
+  if (typeof frontmatter?.type === "string") {
     return "trap";
   }
 
@@ -568,6 +591,10 @@ function normalizeSlugPart(part) {
 }
 
 function renderCompiledMarkdown(document) {
+  if (document.kind === "condition") {
+    return `${document.body.trim()}\n`;
+  }
+
   if (document.kind === "trap") {
     return renderCompiledTrapMarkdown(document);
   }
@@ -1078,14 +1105,13 @@ function formatPotentialAdversaries(value) {
     .filter(Boolean)
     .join(", ");
 }
+function extractMarkdownTitle(source, filePath) {
+  const titleMatch = source.replace(/\r\n/g, "\n").match(/^#\s+(.+)$/m);
 
+  if (!titleMatch) {
+    throw new Error(`Missing H1 title in ${filePath}`);
+  }
 
-
-
-
-
-
-
-
-
+  return titleMatch[1].trim();
+}
 

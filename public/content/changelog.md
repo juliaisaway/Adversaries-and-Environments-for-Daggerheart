@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-04-04
+
+- Added a **Conditions** page.
+- Minor tweaks to accessibility and layout inconsistencies.
+
 ## 2026-04-03
 
 - Changed the **Crossbow Trap** to Tier 1.

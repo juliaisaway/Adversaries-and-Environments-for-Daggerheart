@@ -8,7 +8,7 @@
   font-family: "Montserrat", sans-serif;
   border: 1px solid;
 
-  h1 {
+  h2 {
     text-transform: uppercase;
     font-size: #{functions.rem(32)};
     margin: var(--h1-margin);
@@ -27,7 +27,7 @@
     }
   }
 
-  h2 {
+  h3 {
     text-transform: uppercase;
     font-size: #{functions.rem(19.2)};
     margin: var(--h2-margin);
@@ -43,7 +43,7 @@
     }
   }
 
-  h3 {
+  h4 {
     text-transform: uppercase;
     font-size: #{functions.rem(16)};
     margin: 0 0 8px;
@@ -167,6 +167,12 @@
   margin: var(--card-margin);
 }
 
+.mechanic-page,
+.condition-list {
+  display: grid;
+  gap: var(--card-stack-gap);
+}
+
 .design-notes {
   margin-top: #{functions.rem(16)};
   padding: #{functions.rem(14)} #{functions.rem(16)};
@@ -195,6 +201,7 @@
 .adversary-card,
 .environment-card,
 .trap-card,
+.mechanic-card,
 .welcome {
   @extend %card-shell;
 }
@@ -294,7 +301,7 @@
     margin-top: 16px;
   }
 
-  h3 {
+  h4 {
     display: flex;
 
     &::before {
@@ -309,13 +316,67 @@
   }
 }
 
-.welcome {
-  --card-link-color: color-mix(in srgb, var(--welcome-border-color) 60%, black);
-  background: var(--welcome-card-bg);
-  border-color: var(--welcome-border-color);
+.mechanic-card {
+  --card-link-color: color-mix(
+    in srgb,
+    var(--mechanic-border-color) 60%,
+    black
+  );
+  background: var(--mechanic-card-bg);
+  border-color: var(--mechanic-border-color);
+  border-radius: 0 8px 0 8px;
 
   p {
     margin-left: 0;
     text-indent: 0;
+  }
+
+  .condition-intro {
+    margin-bottom: #{functions.rem(20)};
+
+    h2,
+    h3,
+    h4 {
+      margin-left: 0;
+    }
+  }
+
+  h3 {
+    font-size: #{functions.rem(20)};
+    display: flex;
+    color: var(--mechanic-heading-color);
+    font-weight: 600;
+    margin: 0 0 8px;
+
+    &::before {
+      content: "";
+      margin-right: #{functions.rem(6.4)};
+      display: inline-block;
+      align-self: center;
+      width: 16px;
+      height: 16px;
+      background: var(--highlight-color);
+    }
+  }
+
+  p:first-of-type {
+    margin-top: #{functions.rem(8)};
+  }
+
+  .mechanic-entry:not(:last-child) {
+    margin: 16px 0;
+    border-bottom: 1px dotted var(--mechanic-border-color);
+  }
+}
+
+.welcome {
+  background: var(--welcome-card-bg);
+  border-color: var(--welcome-border-color);
+  h2 {
+    margin-bottom: 8px;
+  }
+  p {
+    text-indent: 0;
+    margin-left: 0;
   }
 }

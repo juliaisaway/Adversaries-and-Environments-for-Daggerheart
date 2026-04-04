@@ -50,7 +50,7 @@ body {
     padding: #{functions.rem(12)};
   }
 
-  h1 {
+  .site-title {
     margin: 0;
     font-size: #{functions.rem(16)};
     font-weight: 300;
@@ -146,7 +146,8 @@ body {
     overflow-y: auto;
     transform: translateX(-100%);
     transition: transform 0.22s ease;
-    box-shadow: 0 #{functions.rem(16)} #{functions.rem(32)} var(--sidebar-shadow-color);
+    box-shadow: 0 #{functions.rem(16)} #{functions.rem(32)}
+      var(--sidebar-shadow-color);
     border-right: 1px solid var(--mobile-header-border);
   }
 
@@ -160,7 +161,7 @@ body {
     }
   }
 
-  h2 {
+  h1 {
     font-size: #{functions.rem(22.4)};
     margin: 0 0 24px;
     font-weight: 300;
@@ -182,7 +183,7 @@ body {
     }
   }
 
-  h3.category-header {
+  h2.category-header {
     font-weight: 500;
     font-size: #{functions.rem(16)};
     margin: 0;
@@ -207,6 +208,9 @@ body {
       font-size: #{functions.rem(14)};
     }
 
+    &.mechanics::before {
+      background: var(--mechanic-border-color);
+    }
     &.adversaries::before {
       background: var(--adv-border-color);
     }
@@ -218,7 +222,7 @@ body {
     }
   }
 
-  h4.tier-header {
+  h3.tier-header {
     font-weight: 500;
     font-size: #{functions.rem(12)};
     margin: 0;

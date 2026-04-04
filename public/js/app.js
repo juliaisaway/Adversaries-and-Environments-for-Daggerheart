@@ -1,13 +1,28 @@
 let isMobileMenuOpen = false;
 const STATIC_PAGE_HOME = "home";
 const STATIC_PAGE_CHANGELOG = "changelog";
+const STATIC_PAGE_CONDITIONS = "conditions";
 const STATIC_PAGE_FILES = {
   [STATIC_PAGE_HOME]: "/content/index.md",
   [STATIC_PAGE_CHANGELOG]: "/content/changelog.md",
+  [STATIC_PAGE_CONDITIONS]: "/content/conditions.md",
 };
 
 function withExternalTargets(html) {
-  return html.replace(/<a\b(?![^>]*\btarget=)([^>]*)>/gi, '<a$1 target="_blank" rel="noopener noreferrer">');
+  return html.replace(
+    /<a\b(?![^>]*\btarget=)([^>]*)>/gi,
+    '<a$1 target="_blank" rel="noopener noreferrer">',
+  );
+}
+
+function demoteHtmlHeadings(html) {
+  return html.replace(
+    /<(\/?)h([1-6])(\b[^>]*)>/gi,
+    (_, slash, level, suffix) => {
+      const nextLevel = Math.min(Number(level) + 1, 6);
+      return `<${slash}h${nextLevel}${suffix}>`;
+    },
+  );
 }
 
 function parseInlineWithExternalTargets(markdown) {
@@ -81,7 +96,7 @@ async function loadFileList() {
   const files = await res.json();
   const sidebar = document.getElementById("sidebar");
 
-  const mainTitle = sidebar.querySelector("h2");
+  const mainTitle = sidebar.querySelector("h1");
   sidebar.innerHTML = "";
   sidebar.appendChild(mainTitle);
   appendStaticNavigation(sidebar);
@@ -122,7 +137,7 @@ async function loadFileList() {
       return;
     }
 
-    const categoryHeader = document.createElement("h3");
+    const categoryHeader = document.createElement("h2");
     categoryHeader.className = `category-header ${category}`;
     categoryHeader.textContent = formatCategoryLabel(category);
     sidebar.appendChild(categoryHeader);
@@ -130,7 +145,7 @@ async function loadFileList() {
     Object.keys(categoryEntries)
       .sort(compareTierLabels)
       .forEach((tier) => {
-        const tierHeader = document.createElement("h4");
+        const tierHeader = document.createElement("h3");
         tierHeader.className = "tier-header";
         tierHeader.textContent = capitalizeWords(tier);
         sidebar.appendChild(tierHeader);
@@ -174,35 +189,47 @@ async function selectFile(file, link) {
 
   if (file.includes("adversaries/")) {
     content.innerHTML = renderAdversaryCard(md);
+    syncFeatherIcons();
     return;
   }
 
   if (file.includes("environments/")) {
     content.innerHTML = renderEnvironmentCard(md);
+    syncFeatherIcons();
     return;
   }
 
   if (file.includes("traps/")) {
     content.innerHTML = renderTrapCard(md);
+    syncFeatherIcons();
     return;
   }
 
-  content.innerHTML = withExternalTargets(marked.parse(md));
+  content.innerHTML = demoteHtmlHeadings(withExternalTargets(marked.parse(md)));
+  syncFeatherIcons();
 }
 
 function appendStaticNavigation(sidebar) {
-  const categoryHeader = document.createElement("h3");
-  categoryHeader.className = "category-header";
-  categoryHeader.textContent = "Pages";
+  appendNavigationSection(sidebar, "Pages", [
+    { label: "Home", route: STATIC_PAGE_HOME },
+    { label: "Changelog", route: STATIC_PAGE_CHANGELOG },
+  ]);
+
+  appendNavigationSection(sidebar, "Mechanics", [
+    { label: "Conditions", route: STATIC_PAGE_CONDITIONS },
+  ]);
+}
+
+function appendNavigationSection(sidebar, title, pages) {
+  const categoryHeader = document.createElement("h2");
+  categoryHeader.className = `category-header ${title.toLowerCase()}`;
+  categoryHeader.textContent = title;
   sidebar.appendChild(categoryHeader);
 
   const ul = document.createElement("ul");
   ul.className = "file-sublist static-pages";
 
-  [
-    { label: "Home", route: STATIC_PAGE_HOME },
-    { label: "Changelog", route: STATIC_PAGE_CHANGELOG },
-  ].forEach((page) => {
+  pages.forEach((page) => {
     const li = document.createElement("li");
     const link = document.createElement("a");
     link.href = `#${page.route}`;
@@ -247,14 +274,18 @@ async function loadInitialRoute() {
     return;
   }
 
-  if (route === STATIC_PAGE_CHANGELOG) {
-    const changelogLink = document.querySelector(`#sidebar a[data-page="${STATIC_PAGE_CHANGELOG}"]`);
-    selectStaticPage(STATIC_PAGE_CHANGELOG, changelogLink);
+  if (route === STATIC_PAGE_CHANGELOG || route === STATIC_PAGE_CONDITIONS) {
+    const pageLink = document.querySelector(`#sidebar a[data-page="${route}"]`);
+    selectStaticPage(route, pageLink);
     return;
   }
 
-  const fileLink = Array.from(document.querySelectorAll(".file-sublist a")).find(
-    (link) => !link.dataset.page && decodeURIComponent(link.getAttribute("href").slice(1)) === route,
+  const fileLink = Array.from(
+    document.querySelectorAll(".file-sublist a"),
+  ).find(
+    (link) =>
+      !link.dataset.page &&
+      decodeURIComponent(link.getAttribute("href").slice(1)) === route,
   );
 
   if (fileLink) {
@@ -271,10 +302,17 @@ async function renderStaticPage(page) {
 
   if (!filePath) {
     content.innerHTML = renderStaticMarkdown("# Page not found");
+    syncFeatherIcons();
     return;
   }
 
   try {
+    if (page === STATIC_PAGE_CONDITIONS) {
+      content.innerHTML = await renderConditionsPage(filePath);
+      syncFeatherIcons();
+      return;
+    }
+
     const res = await fetch(filePath);
 
     if (!res.ok) {
@@ -288,13 +326,72 @@ async function renderStaticPage(page) {
       `# Content unavailable\n\nThere was a problem loading this page.`,
     );
   }
+
+  syncFeatherIcons();
+}
+
+async function renderConditionsPage(introPath) {
+  const [introResponse, listResponse] = await Promise.all([
+    fetch(introPath),
+    fetch("/api/list"),
+  ]);
+
+  if (!introResponse.ok) {
+    throw new Error(`Unable to load ${introPath}`);
+  }
+
+  if (!listResponse.ok) {
+    throw new Error("Unable to load conditions list");
+  }
+
+  const introMarkdown = await introResponse.text();
+  const files = await listResponse.json();
+  const conditionFiles = files
+    .filter((file) => file.startsWith("conditions/") && file.endsWith(".md"))
+    .sort((left, right) => left.localeCompare(right));
+
+  const conditionMarkdown = await Promise.all(
+    conditionFiles.map(async (file) => {
+      const response = await fetch(
+        `/api/file?path=${encodeURIComponent(file)}`,
+      );
+
+      if (!response.ok) {
+        throw new Error(`Unable to load ${file}`);
+      }
+
+      return {
+        file,
+        markdown: await response.text(),
+      };
+    }),
+  );
+
+  const sortedConditions = conditionMarkdown.sort((left, right) => {
+    const leftTitle = extractMarkdownHeading(left.markdown) || left.file;
+    const rightTitle = extractMarkdownHeading(right.markdown) || right.file;
+    return leftTitle.localeCompare(rightTitle);
+  });
+
+  return `
+    <div class="mechanic-page">
+      <div class="card-stack">
+        <div class="mechanic-card">
+          <div class="mechanic-copy">
+            ${demoteHtmlHeadings(withExternalTargets(marked.parse(introMarkdown)))}
+            ${sortedConditions.map((entry) => renderConditionSection(entry.markdown)).join("")}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderStaticMarkdown(md) {
   return `
     <div class="card-stack">
       <div class="welcome">
-        ${withExternalTargets(marked.parse(md))}
+        ${demoteHtmlHeadings(withExternalTargets(marked.parse(md)))}
       </div>
     </div>
   `;
@@ -302,15 +399,25 @@ function renderStaticMarkdown(md) {
 
 function renderAdversaryCard(md) {
   const { meta, body } = parseFrontmatter(md);
-  const h1 = matchOrEmpty(body, /^# (.+)$/m);
-  const subtitle = `Tier ${meta.tier || "?"} ${meta.role ? capitalizeWords(meta.role) : ""}`.trim();
+  const title = matchOrEmpty(body, /^# (.+)$/m);
+  const subtitle =
+    `Tier ${meta.tier || "?"} ${meta.role ? capitalizeWords(meta.role) : ""}`.trim();
   const summary = extractSummary(body);
   const motives = extractSection(body, /## Motives & Tactics/i);
   const features = extractSection(body, /## Features/i);
   const designNotes = extractSection(body, /## Design notes/i);
-  let processedFeatures = features ? features.replace(/### (.+?)\r?\n\r?\n/g, "### $1: ") : "";
-  processedFeatures = processedFeatures.replace(/### (.+?):\s*(.+)/g, "**_$1:_** $2");
-  processedFeatures = markFeatureLeadParagraphs(withExternalTargets(marked.parse(processedFeatures || "")));
+  let processedFeatures = features
+    ? features.replace(/### (.+?)\r?\n\r?\n/g, "### $1: ")
+    : "";
+  processedFeatures = processedFeatures.replace(
+    /### (.+?):\s*(.+)/g,
+    "**_$1:_** $2",
+  );
+  processedFeatures = markFeatureLeadParagraphs(
+    demoteHtmlHeadings(
+      withExternalTargets(marked.parse(processedFeatures || "")),
+    ),
+  );
 
   let blockTable = `<div class="block-table">`;
   blockTable += `<div class="block-content">`;
@@ -334,12 +441,12 @@ function renderAdversaryCard(md) {
   return `
     <div class="card-stack">
       <div class="adversary-card">
-        <h1>${h1}</h1>
+        <h2>${title}</h2>
         <div class="subtitle">${subtitle}</div>
         <div class="summary">${parseInlineWithExternalTargets(summary)}</div>
         <div>${motives ? `<strong>Motives & Tactics:</strong> ${parseInlineWithExternalTargets(motives)}` : ""}</div>
         ${blockTable}
-        <h2>Features</h2>
+        <h3>Features</h3>
         <div class="feature-copy">${processedFeatures}</div>
       </div>
       ${renderDesignNotes(designNotes)}
@@ -349,15 +456,25 @@ function renderAdversaryCard(md) {
 
 function renderEnvironmentCard(md) {
   const { meta, body } = parseFrontmatter(md);
-  const h1 = matchOrEmpty(body, /^# (.+)$/m);
-  const subtitle = `Tier ${meta.tier || "?"} ${meta.type ? capitalizeWords(meta.type) : ""}`.trim();
+  const title = matchOrEmpty(body, /^# (.+)$/m);
+  const subtitle =
+    `Tier ${meta.tier || "?"} ${meta.type ? capitalizeWords(meta.type) : ""}`.trim();
   const summary = extractSummary(body);
   const impulses = extractSection(body, /## Impulses/i);
   const features = extractSection(body, /## Features/i);
   const designNotes = extractSection(body, /## Design notes/i);
-  let processedFeatures = features ? features.replace(/### (.+?)\r?\n\r?\n/g, "### $1: ") : "";
-  processedFeatures = processedFeatures.replace(/### (.+?):\s*(.+)/g, "**_$1:_** $2");
-  processedFeatures = applyFlavorParagraphs(withExternalTargets(marked.parse(processedFeatures || "")));
+  let processedFeatures = features
+    ? features.replace(/### (.+?)\r?\n\r?\n/g, "### $1: ")
+    : "";
+  processedFeatures = processedFeatures.replace(
+    /### (.+?):\s*(.+)/g,
+    "**_$1:_** $2",
+  );
+  processedFeatures = applyFlavorParagraphs(
+    demoteHtmlHeadings(
+      withExternalTargets(marked.parse(processedFeatures || "")),
+    ),
+  );
   processedFeatures = markFeatureLeadParagraphs(processedFeatures);
 
   const blockTable = `
@@ -373,13 +490,13 @@ function renderEnvironmentCard(md) {
     <div class="card-stack">
       <div class="environment-card">
         <div class="env-header">
-          <h1>${h1}</h1>
+          <h2>${title}</h2>
           <div class="subtitle">${subtitle}</div>
           <div class="summary">${parseInlineWithExternalTargets(summary)}</div>
           <div>${impulses ? `<strong>Impulses:</strong> ${parseInlineWithExternalTargets(impulses)}` : ""}</div>
         </div>
         ${blockTable}
-        <h2>Features</h2>
+        <h3>Features</h3>
         <div class="feature-copy environment-features">${processedFeatures}</div>
       </div>
       ${renderDesignNotes(designNotes)}
@@ -389,8 +506,9 @@ function renderEnvironmentCard(md) {
 
 function renderTrapCard(md) {
   const { meta, body } = parseFrontmatter(md);
-  const h1 = matchOrEmpty(body, /^# (.+)$/m);
-  const subtitle = `Tier ${meta.tier || "?"} ${capitalizeWords(meta.type || "")}`.trim();
+  const title = matchOrEmpty(body, /^# (.+)$/m);
+  const subtitle =
+    `Tier ${meta.tier || "?"} ${capitalizeWords(meta.type || "")}`.trim();
   const summary = extractSummary(body);
   const purpose = extractSection(body, /## Purpose/i);
   const designNotes = extractSection(body, /## Design notes/i);
@@ -407,16 +525,31 @@ function renderTrapCard(md) {
   return `
     <div class="card-stack">
       <div class="trap-card">
-        <h1>${h1}</h1>
+        <h2>${title}</h2>
         <div class="subtitle">${subtitle}</div>
         <div class="summary">${parseInlineWithExternalTargets(summary)}</div>
         <div>${purpose ? `<strong>Purpose:</strong> ${parseInlineWithExternalTargets(purpose)}` : ""}</div>
         ${blockTable}
-        <h2>Features</h2>
+        <h3>Features</h3>
         <div class="feature-copy">${withExternalTargets(features || "<p>No features listed.</p>")}</div>
       </div>
       ${renderDesignNotes(designNotes)}
     </div>
+  `;
+}
+
+function renderConditionSection(md) {
+  const title = extractMarkdownHeading(md);
+  const body = removeMarkdownHeading(md).trim();
+  const renderedBody = body
+    ? demoteHtmlHeadings(withExternalTargets(marked.parse(body)))
+    : "<p>No description provided.</p>";
+
+  return `
+    <section class="mechanic-entry">
+      <h3>${title}</h3>
+      <div>${renderedBody}</div>
+    </section>
   `;
 }
 
@@ -488,7 +621,9 @@ function extractSummary(body) {
     return "";
   }
 
-  const afterTitle = body.slice(titleMatch.index + titleMatch[0].length).trimStart();
+  const afterTitle = body
+    .slice(titleMatch.index + titleMatch[0].length)
+    .trimStart();
   const summaryMatch = afterTitle.match(/^([^#\n][^\n]*)/m);
   return summaryMatch ? summaryMatch[1].trim() : "";
 }
@@ -581,14 +716,18 @@ function extractTrapFeatures(body) {
 
   return features
     .map((feature) => {
-      const parts = [`<h3>${feature.title}</h3>`];
+      const parts = [`<h4>${feature.title}</h4>`];
 
       if (feature.trigger) {
-        parts.push(`<p><strong>Trigger:</strong> ${marked.parseInline(feature.trigger)}</p>`);
+        parts.push(
+          `<p><strong>Trigger:</strong> ${marked.parseInline(feature.trigger)}</p>`,
+        );
       }
 
       if (feature.effect) {
-        parts.push(`<p><strong>Effect:</strong> ${marked.parseInline(feature.effect)}</p>`);
+        parts.push(
+          `<p><strong>Effect:</strong> ${marked.parseInline(feature.effect)}</p>`,
+        );
       }
 
       return `<div class="trap-feature">${parts.join("")}</div>`;
@@ -605,7 +744,10 @@ function renderDesignNotes(designNotes) {
 }
 
 function applyFlavorParagraphs(html) {
-  return html.replace(/<p><em>([\s\S]*?)<\/em><\/p>/g, '<p class="flavor"><em>$1</em></p>');
+  return html.replace(
+    /<p><em>([\s\S]*?)<\/em><\/p>/g,
+    '<p class="flavor"><em>$1</em></p>',
+  );
 }
 
 function markFeatureLeadParagraphs(html) {
@@ -617,7 +759,10 @@ function formatCategoryLabel(category) {
 }
 
 function compareTierLabels(left, right) {
-  return extractTierNumber(left) - extractTierNumber(right) || left.localeCompare(right);
+  return (
+    extractTierNumber(left) - extractTierNumber(right) ||
+    left.localeCompare(right)
+  );
 }
 
 function extractTierNumber(label) {
@@ -683,12 +828,12 @@ function formatPotentialAdversaries(potentialAdversaries) {
     }
 
     if (line.startsWith("-") && currentGroup && readingList) {
-      currentEntries.push(line.replace(/^-\s*/, "").trim());
+      currentEntries.push(line.replace(/^\-\s*/, "").trim());
       continue;
     }
 
     if (line.startsWith("- ") && !currentGroup) {
-      groups.push(line.replace(/^-\s*/, "").trim());
+      groups.push(line.replace(/^\-\s*/, "").trim());
     }
   }
 
@@ -699,12 +844,16 @@ function formatPotentialAdversaries(potentialAdversaries) {
   return groups.join(", ");
 }
 
+function extractMarkdownHeading(markdown) {
+  const match = markdown.match(/^#\s+(.+)$/m);
+  return match ? match[1].trim() : "";
+}
+
+function removeMarkdownHeading(markdown) {
+  return markdown.replace(/^#\s+.+$\r?\n?/m, "").trimStart();
+}
+
 window.onload = () => {
   initializeMobileMenu();
   loadFileList();
 };
-
-
-
-
-
