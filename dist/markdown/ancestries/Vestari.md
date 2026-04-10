@@ -8,4 +8,4 @@ Vestari are blue-skinned humanoids marked by the echoes of countless past lives.
 
 **Borrowed Vitality:** You draw on past lives at a cost. Whenever you would spend a Hope, you can instead mark a Hit Point.
 
-> **Design notes:** In _Pathfinder_, my favorite Ancestry was always _Samsaran_. For me, it will always be a special class, I even use it for a character when I coming out as a _trans woman_. So I needed to adapt to Daggerheart.
+> **Design notes:** The _Samsaran_ has always been my favorite ancestry in _Pathfinder_. Its themes of identity and continuity resonated with me on a personal level, so adapting it to Daggerheart felt especially meaningful.

@@ -4,7 +4,7 @@ Corvani are avian humanoids with feathered bodies, sharp beaks, and powerful win
 
 ## Features
 
-**Wings:** You can fly. While flying, you can mark a Stress after an adversary makes an attack against you to gain a +2 bonus to your Evasion against that attack.
+**Take Flight:** You can fly. While flying, you can mark a Stress to move to a location within Far range.
 
 **Razor Beak:** You can make attacks against a target within Close range using your beak, treating it as a Finesse weapon that deals 1d8 physical damage using your Proficiency.
 
