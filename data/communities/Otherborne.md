@@ -1,6 +1,6 @@
 # Otherborne
 
-Being part of a ashborne community means you see the world differently, often acting outside the expectations and logic others rely on.
+Being part of an otherborne community means you see the world differently, often acting outside the expectations and logic others rely on.
 
 ## Features
 
