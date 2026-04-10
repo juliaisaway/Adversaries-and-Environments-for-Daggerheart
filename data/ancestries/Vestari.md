@@ -6,11 +6,11 @@ Vestari are blue-skinned humanoids marked by the echoes of countless past lives.
 
 ### Ancestral Recall
 
-Fragments of past lives guide your actions. Spend a Hope to gain a +2 bonus on your next roll.
+Fragments of past lives guide your actions. Once per long rest, you may spend a Hope to gain a +2 bonus on your next roll.
 
-### Borrowed Vitality
+### Not Yet
 
-You draw on past lives at a cost. Whenever you would spend a Hope, you can instead mark a Hit Point.
+When you would mark your last Hit Point, roll a d6. On a 6, you don’t mark that Hit Point.
 
 ## Design notes
 

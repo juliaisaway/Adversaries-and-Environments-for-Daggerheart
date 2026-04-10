@@ -293,6 +293,7 @@
 .adversary-card,
 .ally-card,
 .ancestry-card,
+.community-card,
 .environment-card,
 .trap-card,
 .mechanic-card,
@@ -348,6 +349,26 @@
 
     hr {
       border-color: var(--ancestry-border-color);
+    }
+  }
+}
+
+.community-card {
+  --card-link-color: color-mix(
+    in srgb,
+    var(--community-border-color) 60%,
+    black
+  );
+  background: var(--community-card-bg);
+  border-color: var(--community-border-color);
+  border-radius: 8px;
+
+  .block-table {
+    border-top: 1px solid var(--community-border-color);
+    border-bottom: 1px solid var(--community-border-color);
+
+    hr {
+      border-color: var(--community-border-color);
     }
   }
 }

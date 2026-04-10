@@ -4,6 +4,8 @@
 
 - Added a new section: [Ancestries](/ancestries/ "Ancestries").
   - Added [Canin](/ancestries/canin/ "Canin"), [Corvani](/ancestries/corvani/ "Corvani") and [Vestari](/ancestries/vestari/ "Vestari").
+- Added a new section: [Communities](/communities/ "Communities").
+  - Added [Ashborne](/communities/ashborne/ "Ashborne"), [Crownborne](/communities/crownborne/ "Crownborne"), [Marshborne](/communities/stageborne/ "Marshborne"), [Otherborne](/communities/otherborne/ "Otherborne") and [Stageborne](/communities/stageborne/ "Stageborne").
 
 ## 2026-04-06
 

@@ -14,4 +14,4 @@ You can make attacks against a target within Close range using your beak, treati
 
 ## Design notes
 
-I started worldbuild a decade ago, using _Pathfinder_ system and my campaign had a lot of Tengus. SO I tried to homebrew an equivalent for Daggerheart.
+I started worldbuilding a decade ago, using _Pathfinder_ system and my campaign had a lot of Tengus. SO I tried to homebrew an equivalent for Daggerheart.

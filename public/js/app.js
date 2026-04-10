@@ -8,6 +8,7 @@ let organizedContent = {
   traps: {},
   allies: {},
   ancestries: {},
+  communities: {},
 };
 const filePathToRoute = new Map();
 const routeToFilePath = new Map();
@@ -17,8 +18,9 @@ const CATEGORY_CONFIG = {
   traps: { groupedByTier: true },
   allies: { groupedByTier: false },
   ancestries: { groupedByTier: false },
+  communities: { groupedByTier: false },
 };
-const CATEGORY_ORDER = ["adversaries", "allies", "ancestries", "environments", "traps"];
+const CATEGORY_ORDER = ["adversaries", "allies", "ancestries", "communities", "environments", "traps"];
 const MECHANIC_DATA_PAGE_SLUGS = new Set(["conditions"]);
 const STATIC_PAGE_HOME = "/";
 const STATIC_PAGE_CHANGELOG = "/changelog/";
@@ -176,6 +178,7 @@ function buildOrganizedContent() {
     traps: {},
     allies: {},
     ancestries: {},
+    communities: {},
   };
 
   dataFiles.forEach((file) => {
@@ -418,6 +421,12 @@ async function selectFile(file, link, options = {}) {
 
   if (file.includes("ancestries/")) {
     content.innerHTML = renderAncestryCard(md);
+    syncFeatherIcons();
+    return;
+  }
+
+  if (file.includes("communities/")) {
+    content.innerHTML = renderCommunityCard(md);
     syncFeatherIcons();
     return;
   }
@@ -987,6 +996,27 @@ function renderAncestryCard(md) {
   return `
     <div class="card-stack">
       <div class="ancestry-card">
+        <h2>${title}</h2>
+        <div class="summary">${parseInlineWithExternalTargets(summary)}</div>
+        <h3>Features</h3>
+        <div class="feature-copy">${processedFeatures}</div>
+      </div>
+      ${renderDesignNotes(designNotes)}
+    </div>
+  `;
+}
+
+function renderCommunityCard(md) {
+  const { body } = parseFrontmatter(md);
+  const title = matchOrEmpty(body, /^# (.+)$/m);
+  const summary = extractSummary(body);
+  const features = extractSection(body, /## Features/i);
+  const designNotes = extractSection(body, /## Design notes/i);
+  const processedFeatures = renderStandardFeatureMarkup(features);
+
+  return `
+    <div class="card-stack">
+      <div class="community-card">
         <h2>${title}</h2>
         <div class="summary">${parseInlineWithExternalTargets(summary)}</div>
         <h3>Features</h3>

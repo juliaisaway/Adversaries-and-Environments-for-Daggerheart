@@ -239,6 +239,9 @@ body {
     &.ancestries::before {
       background: var(--ancestry-border-color);
     }
+    &.communities::before {
+      background: var(--community-border-color);
+    }
     &.environments::before {
       background: var(--env-border-color);
     }

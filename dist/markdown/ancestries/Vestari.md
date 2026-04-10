@@ -4,8 +4,8 @@ Vestari are blue-skinned humanoids marked by the echoes of countless past lives.
 
 ## Features
 
-**Ancestral Recall:** Fragments of past lives guide your actions. Spend a Hope to gain a +2 bonus on your next roll.
+**Ancestral Recall:** Fragments of past lives guide your actions. Once per long rest, you may spend a Hope to gain a +2 bonus on your next roll.
 
-**Borrowed Vitality:** You draw on past lives at a cost. Whenever you would spend a Hope, you can instead mark a Hit Point.
+**Not Yet:** When you would mark your last Hit Point, roll a d6. On a 6, you don’t mark that Hit Point.
 
 > **Design notes:** The _Samsaran_ has always been my favorite ancestry in _Pathfinder_. Its themes of identity and continuity resonated with me on a personal level, so adapting it to Daggerheart felt especially meaningful.
