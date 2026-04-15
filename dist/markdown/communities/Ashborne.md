@@ -1,6 +1,6 @@
 # Ashborne
 
-Being part of a ashborne community means you were shaped by volatile landscapes, where the ground shifts, danger is constant, and survival depends on acting without hesitation.
+Being part of an ashborne community means you were shaped by volatile landscapes, where the ground shifts, danger is constant, and survival depends on acting without hesitation.
 
 ## Features
 

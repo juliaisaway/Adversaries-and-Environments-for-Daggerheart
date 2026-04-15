@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-04-15
+
+- Added a new Community: [Mistborne](/communities/mistborne/ "Mistborne")
+
 ## 2026-04-09
 
 - Added a new section: [Ancestries](/ancestries/ "Ancestries").

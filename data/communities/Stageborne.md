@@ -1,6 +1,6 @@
 # Stageborne
 
-Being part of a stageborne community means you excels at controlling how you are perceived, adapting your behavior, and maintaining a role under pressure.
+Being part of a stageborne community means you were raised among performers, where identity is fluid and life is shaped by constant performance and adaptation.
 
 ## Features
 

@@ -1,6 +1,6 @@
 # Otherborne
 
-Being part of an otherborne community means you see the world differently, often acting outside the expectations and logic others rely on.
+Being part of an otherborne community means you come from beyond this world, shaped by a place with unfamiliar rules and realities.
 
 ## Features
 
