@@ -273,7 +273,7 @@
   background: var(--design-notes-bg);
   color: var(--text-dark);
   line-height: #{functions.rem(25.6)};
-  font-family: "Montserrat", Arial, sans-serif;
+  font-family: "Montserrat", sans-serif;
 
   @media (max-width: #{functions.rem(896)}) {
     font-size: #{functions.rem(15.2)};
