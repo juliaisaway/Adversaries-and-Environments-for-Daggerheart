@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-08-01
+
+- Added three new adversaries:
+  - [Sentinel Gearhulk](/adversaries/tier-3/sentinel-gearhulk/)
+  - [Sentinel Node](/adversaries/tier-2/sentinel-node/)
+  - [Crimson Rite Overseer](/adversaries/tier-2/crimson-rite-overseer/)
+
 ## 2026-05-13
 
 - Added a new section: [Structures](/mechanics/structures/ "Structures"). They represent large-scale entities made of multiple interconnected parts.
