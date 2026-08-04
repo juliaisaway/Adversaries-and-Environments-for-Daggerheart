@@ -1,12 +1,12 @@
 ---
 tier: 2
 role: ranged
-difficulty: 13
+difficulty: 3
 thresholds: [6, 14]
 healthPoints: 13
 stress: 3
 attack: +4
-weapon: Magitech Cannon
+weapon: Aether Cannon
 range: Far
 damage: 2d10+4
 damageType: magic
@@ -26,7 +26,7 @@ Guard the Gearhulk, Identify Threats, Focus Fire, Hold Defensive Positions
 
 Mark a Stress to lock onto a target within Far range. While locked, the first attack against the locked target gains +2 to its attack roll. The lock ends when the Node is destroyed or the target becomes Hidden.
 
-### Concentrate Fire - Action
+### Aether Channeling - Action
 
 Spend a Fear to charge the Node's cannon. The next Standard attack it makes has advantage and deals 2d12+6 magic damage.
 

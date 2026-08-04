@@ -6,14 +6,14 @@ A bronze, spider-like construct with a glowing arcane lens and a swiveling magit
 
 **Motives & Tactics:** Guard the Gearhulk, Identify Threats, Focus Fire, Hold Defensive Positions
 
-> Difficulty: 13 | Thresholds: 6/14 | HP: 13 | Stress 3
-> ATK: +4 | Magitech Cannon: Far | 2d10+4 mag
+> Difficulty: 3 | Thresholds: 6/14 | HP: 13 | Stress 3
+> ATK: +4 | Aether Cannon: Far | 2d10+4 mag
 
 ## Features
 
 **Threat Lock - Action:** Mark a Stress to lock onto a target within Far range. While locked, the first attack against the locked target gains +2 to its attack roll. The lock ends when the Node is destroyed or the target becomes Hidden.
 
-**Concentrate Fire - Action:** Spend a Fear to charge the Node's cannon. The next Standard attack it makes has advantage and deals 2d12+6 magic damage.
+**Aether Channeling - Action:** Spend a Fear to charge the Node's cannon. The next Standard attack it makes has advantage and deals 2d12+6 magic damage.
 
 **Defensive Formation - Reaction:** When an ally within Very Close range would take damage, mark a Stress to become the target of that damage instead.
 

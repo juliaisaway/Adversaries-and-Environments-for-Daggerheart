@@ -7,14 +7,14 @@ A charismatic leader who oversees the Crimson Rite's operations, manipulating mi
 **Motives & Tactics:** Manipulate intruders, command loyal followers, preserve the Rite at any cost.
 
 > Difficulty: 14 | Thresholds: 9/19 | HP: 5 | Stress 3
-> ATK: +1 | Greatstaff: Far | 2d8+3 phy
+> ATK: +1 | Greatstaff: Far | 2d8+3 mag
 > Experience: Rituals +3, Fallen Lore +3
 
 ## Features
 
 **Unshakable Conviction - Passive:** All action rolls to deceive or intimidate the Overseer have disadvantage.
 
-**Command the Faithless - Action:** Mark a Stress to make a Standard attack agains a target within Far range. On a success, the target immediately take the spotlight and must make a Standard attack against a creature within Very Close range of them.
+**Command the Faithless - Action:** Choose a target within Far range. They must make a Presence Reaction Roll (16). On a failure, they immediately take the spotlight and must make a Standard attack against a creature of the Overseer's choice within Very Close range, if able.
 
 **Summon the Cult - Action:** Once per scene, mark a Stress to summon a Crimson Rite Acolyte at Far range. The Acolyte acts immediately after the Overseer.
 

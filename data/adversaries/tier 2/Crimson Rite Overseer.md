@@ -9,7 +9,7 @@ attack: +1
 weapon: Greatstaff
 range: Far
 damage: 2d8+3
-damageType: physical
+damageType: magic
 experience: [Rituals +3, Fallen Lore +3]
 ---
 
@@ -29,7 +29,7 @@ All action rolls to deceive or intimidate the Overseer have disadvantage.
 
 ### Command the Faithless - Action
 
-Mark a Stress to make a Standard attack agains a target within Far range. On a success, the target immediately take the spotlight and must make a Standard attack against a creature within Very Close range of them.
+Choose a target within Far range. They must make a Presence Reaction Roll (16). On a failure, they immediately take the spotlight and must make a Standard attack against a creature of the Overseer's choice within Very Close range, if able.
 
 ### Summon the Cult - Action
 
